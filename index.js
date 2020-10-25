@@ -1,5 +1,7 @@
 const { Client, RichEmbed } = require("discord.js")
 const chalk = require("chalk")
+const db = require('quick.db')
+const ms = require('parse-ms')
 
 const { token } = require("./config/config.js")
 

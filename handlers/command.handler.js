@@ -5,6 +5,7 @@ const { readdirSync } = require("fs")
 const { prefix } = require(__dirname + "/../config/config.js")
 
 const ascii = require("ascii-table")
+const { botPermissions } = require("../commands/clear")
 
 const table = new ascii().setHeading("Command", "Load status")
 
@@ -13,7 +14,7 @@ module.exports = (client) => {
     client.commands = new Collection()
 
     const commandFiles = readdirSync(__dirname + "/../commands").filter((file) =>
-    file.endsWith(".command.js")
+    file.endsWith(".js")
 )
 
 for ( const file of commandFiles) {
@@ -58,6 +59,28 @@ for ( const file of commandFiles) {
 
         if (cmd.guildOnly && !guild) {
            return msg.reply("I cant't execute that command inside DMs!")
+        }
+
+        // =========================
+        //
+        // Check permissions
+        //
+        // =========================
+        // Check bot permissions
+        if (cmd.botPermissions && cmd.botPermissions.length) {
+            if (!guild.me.permissionsIn(channel).has(cmd.botPermissions)) {
+                return channel.send(`Potrzebuję więcej permisji! Wymagane permisje \`${cmd.botPermissions.join(
+                    "`,`",
+                    )}\`.`)
+                }
+            }
+    
+
+        // Check user permissions
+        if (cmd.userPermissions && cmd.userPermissions.length) {
+            if (!msg.member.permissionsIn(channel).has(cmd.userPermissions)) {
+                return msg.reply("**Masz wymagane permisje**")
+        }
         }
 
         if (cmd.args && !args.length) {
